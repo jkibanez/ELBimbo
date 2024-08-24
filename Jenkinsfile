@@ -148,6 +148,8 @@ pipeline {
                         }
 
                         def albReport = []
+                        def clbReport = []
+
                         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId: "${credentialsID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                             try {
                                 def cmd = "python3 alblist.py \"${environment.name}\""
@@ -164,10 +166,7 @@ pipeline {
                             if (albReport.isEmpty()) {
                                 unstable("Null return value.")
                             }
-                        }
 
-                        def clbReport = []
-                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId: "${credentialsID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                             try {
                                 def cmd = "python3 clblist.py \"${environment.name}\""
 

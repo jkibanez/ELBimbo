@@ -143,7 +143,7 @@ if __name__ == "__main__":
     aws_environment = aws_environment.replace(" ", "")
     
     # Define the CSV file name
-    csv_file_name = f"{aws_environment}-ALB_{formatted_date}_.csv"
+    csv_file_name = f"{aws_environment}-ALB_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
