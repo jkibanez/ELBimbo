@@ -148,6 +148,14 @@ if __name__ == "__main__":
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
     headers = ['AWS Environment', 'Region', 'ALB Name', 'Target Group', 'Target Server', 'Instance ID']
     
+    # session = boto3.session.Session(profile_name='default', region_name=region)
+    session = boto3.session.Session(region_name=region)
+    elb = session.client('elbv2')
+    ec2 = session.client('ec2')
+
+    iam.attach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
+    time.sleep(10)
+
     # Open a new CSV file
     with open(csv_file_name, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
@@ -159,10 +167,7 @@ if __name__ == "__main__":
             print(region)
 
             # profile = sys.argv[2]
-            # session = boto3.session.Session(profile_name='default', region_name=region)
-            session = boto3.session.Session(region_name=region)
-            elb = session.client('elbv2')
-            ec2 = session.client('ec2')
+
             elbdata = describelbs()
 
             for elb in elbdata:
@@ -203,4 +208,5 @@ if __name__ == "__main__":
                         })
 
                 # input("")
-                
+    
+    iam.detach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")

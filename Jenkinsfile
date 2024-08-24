@@ -113,11 +113,11 @@ def awsEnvironments = [
     ),
     new awsEnvironment(    
         name: "HRSmart",
-        credentialsID: 'MarkSampayan_HRSmart'
+        credentialsID: 'infra-at-hrsmart'
     ),
     new awsEnvironment(    
         name: "ComputerEase",
-        credentialsID: 'MarkSampayan_ComputerEase'
+        credentialsID: 'infra-at-computerease'
     )
 ]
 
