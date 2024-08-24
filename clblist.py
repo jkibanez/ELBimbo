@@ -4,6 +4,7 @@ import sys
 import json
 from datetime import datetime, timezone
 import csv
+import time
 
 def getinstancename(instanceid):
     instances=ec2.describe_instances(Filters=[

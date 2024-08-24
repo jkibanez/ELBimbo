@@ -4,6 +4,7 @@ import sys
 import json
 from datetime import datetime, timezone
 import csv
+import time
 
 def gettargetgroups(arn):
     tgs=elb.describe_target_groups(LoadBalancerArn=arn)
