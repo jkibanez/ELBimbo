@@ -102,7 +102,7 @@ if __name__ == "__main__":
     aws_environment = aws_environment.replace(" ", "")
     
     # Define the CSV file name
-    csv_file_name = f"{aws_environment}_CLB_{formatted_date}.csv"
+    csv_file_name = f"{aws_environment}-CLB_{formatted_date}.csv"
     
     # Define the header names based on the data we are collecting
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
@@ -115,7 +115,8 @@ if __name__ == "__main__":
         writer.writeheader()
         for region in region_names:
             #print(region)
-            session = boto3.session.Session(profile_name='default', region_name=region)
+            # session = boto3.session.Session(profile_name='default', region_name=region)
+            session = boto3.session.Session(region_name=region)
             elb = session.client('elb')
             ec2 = session.client('ec2')
             elbdata = describelbs()

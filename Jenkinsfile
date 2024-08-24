@@ -134,10 +134,10 @@ pipeline {
         }
         stage('Checkout Source') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: "*/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/RodGuiamoy/AWS-Console-Login-Audit.git"]]])
+                checkout([$class: 'GitSCM', branches: [[name: "*/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/jkibanez/ELBimbo.git"]]])
             }
         }
-        stage('Get IAM User Data') {
+        stage('Get ELB Data') {
             steps {
                 script {
                     awsEnvironments.each { environment ->
@@ -147,12 +147,12 @@ pipeline {
                             unstable("Unable to find an AWS Credential for AWS environment ${environment.name}.")
                         }
 
-                        def consoleAccessReport = []
+                        def albReport = []
                         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId: "${credentialsID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                             try {
-                                def cmd = "python3 get_console_access_report.py \"${environment.name}\""
+                                def cmd = "python3 alblist.py \"${environment.name}\""
 
-                                consoleAccessReport = sh(script: cmd, returnStdout: true).trim()
+                                albReport = sh(script: cmd, returnStdout: true).trim()
 
                                 // echo "IAM Users:\n${iamUsers}"
                                     
@@ -161,8 +161,27 @@ pipeline {
                                 unstable("An error occurred:${e.message}")
                             }
 
-                            if (consoleAccessReport.isEmpty()) {
-                                unstable("No users returned.")
+                            if (albReport.isEmpty()) {
+                                unstable("Null return value.")
+                            }
+                        }
+
+                        def clbReport = []
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId: "${credentialsID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            try {
+                                def cmd = "python3 clblist.py \"${environment.name}\""
+
+                                clbReport = sh(script: cmd, returnStdout: true).trim()
+
+                                // echo "IAM Users:\n${iamUsers}"
+                                    
+                            }
+                            catch (Exception e) {
+                                unstable("An error occurred:${e.message}")
+                            }
+
+                            if (clbReport.isEmpty()) {
+                                unstable("Null return value.")
                             }
                         }
                     }
@@ -190,11 +209,11 @@ pipeline {
                     def formattedDate = currentDate.format("MMddyyyy")
 
                     emailext(
-                        subject: "AWS Console Access Report - ${formattedDate}",
+                        subject: "AWS Load Balancer Report - ${formattedDate}",
                         body: '',
                         mimeType: 'text/html',
                         from: 'CloudNoReply@deltek.com',
-                        to: 'janrudolfguiamoy@deltek.com',
+                        to: 'janrudolfguiamoy@deltek.com, johnkennethibanez@deltek.com',
                         attachmentsPattern: "**/*${formattedDate}.xlsx" // Replace 'desired_file.txt' with your file name or pattern
                     )
 

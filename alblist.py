@@ -129,6 +129,7 @@ if __name__ == "__main__":
         "eu-north-1",
         "sa-east-1"
     ]
+
     #print(region)
     #region_name = sys.argv[2]
     # Get the current date
@@ -141,7 +142,7 @@ if __name__ == "__main__":
     aws_environment = aws_environment.replace(" ", "")
     
     # Define the CSV file name
-    csv_file_name = f"{aws_environment}_ALB_{formatted_date}_.csv"
+    csv_file_name = f"{aws_environment}-ALB_{formatted_date}_.csv"
     
     # Define the header names based on the data we are collecting
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
@@ -158,7 +159,8 @@ if __name__ == "__main__":
             print(region)
 
             # profile = sys.argv[2]
-            session = boto3.session.Session(profile_name='default', region_name=region)
+            # session = boto3.session.Session(profile_name='default', region_name=region)
+            session = boto3.session.Session(region_name=region)
             elb = session.client('elbv2')
             ec2 = session.client('ec2')
             elbdata = describelbs()
