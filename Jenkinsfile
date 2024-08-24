@@ -44,7 +44,7 @@ def awsEnvironments = [
         credentialsID: 'infra-at-deltekea'
     ),
     new awsEnvironment(    
-        name: "EC-Maconomy-Sandbox",
+        name: "EC-MN-SB",
         credentialsID: 'infra-at-ecmaconomy'
     ),
     new awsEnvironment(    
