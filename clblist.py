@@ -133,8 +133,13 @@ if __name__ == "__main__":
                 region_data = region
                 # print(region_data)
                 elb_name = elb['Name']
+                
+                ec2_data = ""
+                instanceid_data = ""
+
                 print(elb_name)
                 print(elb['Name'])
+
                 for tg in elb['Instances']:
                     print(tg['Name'])
                     ec2_data = tg['Name']
