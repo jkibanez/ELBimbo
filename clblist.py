@@ -141,7 +141,7 @@ if __name__ == "__main__":
                 print(elb['Name'])
 
                 for tg in elb['Instances']:
-                    print(tg['Name'])
+                    # print(tg['Name'])
                     ec2_data = tg['Name']
                     instanceid_data = tg['InstanceId']
                     print(tg['InstanceId'])
