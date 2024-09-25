@@ -92,25 +92,6 @@ if __name__ == "__main__":
      #   exit()
 
     aws_environment = sys.argv[1]
-    # region_names = [
-    #     "us-east-1",
-    #     "us-east-2",
-    #     "us-west-1",
-    #     "us-west-2",
-    #     "ap-south-1",
-    #     "ap-northeast-3",
-    #     "ap-northeast-2",
-    #     "ap-southeast-1",
-    #     "ap-southeast-2",
-    #     "ap-northeast-1",
-    #     "ca-central-1",
-    #     "eu-central-1",
-    #     "eu-west-1",
-    #     "eu-west-2",
-    #     "eu-west-3",
-    #     "eu-north-1",
-    #     "sa-east-1"
-    # ]
     region_names = [
         "us-east-1",
         "us-east-2",
@@ -147,7 +128,7 @@ if __name__ == "__main__":
     
     # Define the header names based on the data we are collecting
     # headers = ['ELBName', 'Email', 'ConsoleAccess', 'IsServiceAccount', 'MFA', 'AccessKeys', 'LastLogin', 'LoggedInAfterDisablementDate', 'ForImmediateDeletion']
-    headers = ['AWS Environment', 'Region', 'ALB Name', 'Target Group', 'Target Server', 'Instance ID']
+    headers = ['AWS Environment', 'Region', 'ALB Name', 'Target Group', 'Target Server', 'Instance ID', 'TargetHealth', 'Ghost ELB']
     
     iam = boto3.client("iam")
     iam.attach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
@@ -161,9 +142,6 @@ if __name__ == "__main__":
         writer.writeheader()
 
         for region in region_names:
-            print(region)
-
-            # session = boto3.session.Session(profile_name='default', region_name=region)
             session = boto3.session.Session(region_name=region)
             elb = session.client('elbv2')
             ec2 = session.client('ec2')
@@ -172,41 +150,47 @@ if __name__ == "__main__":
 
             for elb in elbdata:
                 region_data = region
-                # print(region_data)
                 elb_name = elb['Name']
                 print(elb_name)
-                #print(elb['Name'])
                 for tg in elb['TGData']:
                     
-                    print(tg)
                     tg_data = tg['Name']
-                    #print(tg['Name'])
-                    #print(tg['Instances'])
-                    for ec2 in tg['Instances']:
-                        ec2_data = ec2['Name']
-                        instanceid_data = ec2['Target']['Id']
-                        #print(ec2['Name'])
-                        #print(ec2['Target']['Id'])
-            
-                # Write the user's details to the CSV
+                    ec2_data = ""
+                    instanceid_data = ""
+
+                    ghost_elb = 'N'
+                    if len(tg['Instances']) == 0:
+                        ghost_elb = 'Y'
+
                         writer.writerow({
                             'AWS Environment': aws_environment,
                             'Region': region_data,
                             'ALB Name': elb_name,
                             'Target Group': tg_data,
                             'Target Server': ec2_data,
-                            'Instance ID': instanceid_data
-                    
-                            # 'Email': email,
-                            # 'ConsoleAccess': console_access,
-                            # 'LastLogin': last_login,
-                            # 'LoggedInAfterDisablementDate': logged_in_after_disablement_date,
-                            # 'IsServiceAccount': service_account,
-                            # 'MFA': mfa,
-                            # 'AccessKeys': access_keys,
-                            # 'ForImmediateDeletion': for_immediate_deletion
+                            'Instance ID': instanceid_data,
+                            'Ghost ELB' : ghost_elb
                         })
 
-                # input("")
+                    else:
+                        for ec2 in tg['Instances']:
+                            ec2_data = ec2['Name']
+                            instanceid_data = ec2['Target']['Id']
+                            target_health = ec2['TargetHealth']['Description']
+
+                            # print(ec2)
+                            # input()
+                
+                            # Write the user's details to the CSV
+                            writer.writerow({
+                                'AWS Environment': aws_environment,
+                                'Region': region_data,
+                                'ALB Name': elb_name,
+                                'Target Group': tg_data,
+                                'Target Server': ec2_data,
+                                'Instance ID': instanceid_data,
+                                'TargetHealth': target_health,
+                                'Ghost ELB' : ghost_elb
+                            })
     
     iam.detach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
