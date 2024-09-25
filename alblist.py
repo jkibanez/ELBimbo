@@ -182,7 +182,7 @@ if __name__ == "__main__":
                             # print(ec2)
                             # input()
                 
-                            Write the user's details to the CSV
+                            # Write the user's details to the CSV
                             writer.writerow({
                                 'AWS Environment': aws_environment,
                                 'Region': region_data,
