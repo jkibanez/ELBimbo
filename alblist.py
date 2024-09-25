@@ -176,12 +176,13 @@ if __name__ == "__main__":
                         for ec2 in tg['Instances']:
                             ec2_data = ec2['Name']
                             instanceid_data = ec2['Target']['Id']
-                            target_health = ec2['TargetHealth']['Description']
+                            target_health = ec2['TargetHealth']['State']
+                            # print(ec2)
 
                             # print(ec2)
                             # input()
                 
-                            # Write the user's details to the CSV
+                            Write the user's details to the CSV
                             writer.writerow({
                                 'AWS Environment': aws_environment,
                                 'Region': region_data,
@@ -191,6 +192,6 @@ if __name__ == "__main__":
                                 'Instance ID': instanceid_data,
                                 'TargetHealth': target_health,
                                 'Ghost ELB' : ghost_elb
-                            })
+                             })
     
     iam.detach_user_policy(UserName='sre-cli-user',PolicyArn="arn:aws:iam::aws:policy/AdministratorAccess")
