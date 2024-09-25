@@ -126,6 +126,14 @@ pipeline {
     agent { label 'jenkins-slave-linux-cu01use1gs1jx01' }
     // agent any
 
+    parameters {
+        choice(
+            name: 'AWSEnvironmentSelect',
+            choices: ['ALL','ArchSandbox','Avitru','ComputerEase','CostPoint','DCO','DCO Sandbox','DCO Secsandbox','Deltekdev','DeltekEA','EC-MN-SB','EC-MGT','EC-SSEC','Especs','Flexplus','GlobalOSS','GovWin','GovWinDev','HRSmart','Interspec','Offsec','Onvia, Inc.','PieterEerlings','SC-DHTMLX','SC-SSEC','SC-Vantagepoint','ServiceBroker','Unionpoint']
+            //choices: ['rod_aws']
+        )
+    }
+
     stages {
         stage('Clean Workspace') {
             steps {
@@ -134,14 +142,37 @@ pipeline {
         }
         stage('Checkout Source') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: "*/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/jkibanez/ELBimbo.git"]]])
+                checkout([$class: 'GitSCM', branches: [[name: "*/1-add-aws-environment-parameter"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/jkibanez/ELBimbo.git"]]])
             }
         }
         stage('Get ELB Data') {
             steps {
                 script {
-                    awsEnvironments.each { environment ->
-                        
+                    
+                    def selectedAWSEnvironments = []
+
+                    if ( params.AWSEnvironmentSelect == 'ALL') {
+                        selectedAWSEnvironments = awsEnvironments
+                    }
+                    else {
+                        def selectedAWSEnvironment = awsEnvironments.find { it.name == params.AWSEnvironmentSelect }
+
+                        if (selectedAWSEnvironment == null) {
+                            error("Unable to find AWS environment ${params.AWSEnvironmentSelect} in AWS environments definition.")
+                        }
+
+                        selectedAWSEnvironments = [selectedAWSEnvironment]
+                    }
+
+                    // echo "${selectedAWSEnvironment.name}"
+
+                    // def var1  = 'a'
+                    // def var2 = ['a']
+
+                    // for (i = 0; i < selectedAWSEnvironment.length; i++){
+                    selectedAWSEnvironments.each { environment ->
+                        // environment = selectedAWSEnvironment[i]
+
                         credentialsID = environment.credentialsID
                         if (!credentialsID) {
                             unstable("Unable to find an AWS Credential for AWS environment ${environment.name}.")
@@ -212,7 +243,7 @@ pipeline {
                         body: '',
                         mimeType: 'text/html',
                         from: 'CloudNoReply@deltek.com',
-                        to: 'janrudolfguiamoy@deltek.com, johnkennethibanez@deltek.com',
+                        to: 'CloudInfraSRE@deltek.com',
                         attachmentsPattern: "**/*${formattedDate}.xlsx" // Replace 'desired_file.txt' with your file name or pattern
                     )
 
