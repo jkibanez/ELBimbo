@@ -54,7 +54,7 @@ def describelbs():
     lb_tg_data = []
    
     #for _ in range(3):
-    for lb in lbs["LoadBalancers"][:3]:
+    for lb in lbs["LoadBalancers"]:
         lbjson={}
        
         # print (f"{lb["LoadBalancerName"]}")
