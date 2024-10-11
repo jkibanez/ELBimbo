@@ -142,7 +142,7 @@ pipeline {
         }
         stage('Checkout Source') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: "*/1-add-aws-environment-parameter"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/jkibanez/ELBimbo.git"]]])
+                checkout([$class: 'GitSCM', branches: [[name: "*/main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "https://github.com/jkibanez/ELBimbo.git"]]])
             }
         }
         stage('Get ELB Data') {
@@ -251,26 +251,26 @@ pipeline {
                     senderEmail = 'CloudNoReply@deltek.com'
                     recipientEmail = 'johnkennethibanez@deltek.com, janrudolfguiamoy@deltek.com'
                     subject = "AWS Load Balancer Report - ${formattedDate}"
-                    body = ""
+                    body = "Please see attached."
                     attachment = "AWS Load Balancer Report - ${formattedDate}.xlsx"
  
                     // Write the content to the file
-                    // emailBodyFilePath = 'email_body.html'
-                    // writeFile file: emailBodyFilePath, text: body
+                    emailBodyFilePath = 'email_body.html'
+                    writeFile file: emailBodyFilePath, text: body
  
                     try {
  
-                        def cmd = "python3 send_email.py \"${smtpServer}\" \"${senderEmail}\" \"${recipientEmail}\" \"${subject}\" \"\" \"${attachment}\""
+                        def cmd = "python3 send_email.py \"${smtpServer}\" \"${senderEmail}\" \"${recipientEmail}\" \"${subject}\" \"${emailBodyFilePath}\" \"${attachment}\""
  
                         scriptOutput = sh(script: cmd, returnStdout: true).trim()
                         echo "${scriptOutput}"
  
-                        summary << new summaryItem(step: "SendEmail", result: "Success")
+                        // summary << new summaryItem(step: "SendEmail", result: "Success")
  
                     }
                     catch (Exception e) {
                         unstable("An error occurred:${e.message}")
-                        summary << new summaryItem(step: "SendEmail", result: "Failed - ${e.message}")
+                        // summary << new summaryItem(step: "SendEmail", result: "Failed - ${e.message}")
                     }
 
                 }

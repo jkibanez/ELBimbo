@@ -57,7 +57,7 @@ def describelbs():
     for lb in lbs["LoadBalancers"]:
         lbjson={}
        
-        # print (f"{lb["LoadBalancerName"]}")
+        print (f"{lb["LoadBalancerName"]}")
        
         lbjson['Name']=lb["LoadBalancerName"]
         lbjson['Type']=lb["Type"]
