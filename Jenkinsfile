@@ -238,14 +238,40 @@ pipeline {
                     def currentDate = new Date()
                     def formattedDate = currentDate.format("MMddyyyy")
 
-                    emailext(
-                        subject: "AWS Load Balancer Report - ${formattedDate}",
-                        body: '',
-                        mimeType: 'text/html',
-                        from: 'CloudNoReply@deltek.com',
-                        to: 'CloudInfraSRE@deltek.com',
-                        attachmentsPattern: "**/*${formattedDate}.xlsx" // Replace 'desired_file.txt' with your file name or pattern
-                    )
+                    // emailext(
+                    //     subject: "AWS Load Balancer Report - ${formattedDate}",
+                    //     body: '',
+                    //     mimeType: 'text/html',
+                    //     from: 'CloudNoReply@deltek.com',
+                    //     to: 'CloudInfraSRE@deltek.com',
+                    //     attachmentsPattern: "**/*${formattedDate}.xlsx" // Replace 'desired_file.txt' with your file name or pattern
+                    // )
+
+                    smtpServer = 'smtp.gss.mydeltek.local'
+                    senderEmail = 'CloudNoReply@deltek.com'
+                    recipientEmail = 'johnkennethibanez@deltek.com, janrudolfguiamoy@deltek.com'
+                    subject = "AWS Load Balancer Report - ${formattedDate}"
+                    body = ""
+                    attachment = "AWS Load Balancer Report - ${formattedDate}.xlsx"
+ 
+                    // Write the content to the file
+                    // emailBodyFilePath = 'email_body.html'
+                    // writeFile file: emailBodyFilePath, text: body
+ 
+                    try {
+ 
+                        def cmd = "python3 send_email.py \"${smtpServer}\" \"${senderEmail}\" \"${recipientEmail}\" \"${subject}\" \"\" \"${attachment}\""
+ 
+                        scriptOutput = sh(script: cmd, returnStdout: true).trim()
+                        echo "${scriptOutput}"
+ 
+                        summary << new summaryItem(step: "SendEmail", result: "Success")
+ 
+                    }
+                    catch (Exception e) {
+                        unstable("An error occurred:${e.message}")
+                        summary << new summaryItem(step: "SendEmail", result: "Failed - ${e.message}")
+                    }
 
                 }
             }
